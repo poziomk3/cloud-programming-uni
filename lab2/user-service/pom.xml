@@ -88,7 +88,44 @@
 			<artifactId>spring-rabbit-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>io.swagger.core.v3</groupId>
+			<artifactId>swagger-annotations</artifactId>
+			<version>2.2.15</version>
+		</dependency>
+
+		<!-- Nullable support used in DTOs -->
+		<dependency>
+			<groupId>org.openapitools</groupId>
+			<artifactId>jackson-databind-nullable</artifactId>
+			<version>0.2.4</version>
+		</dependency>
+
+		<!-- Javax Validation API compatibility -->
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>2.0.1.Final</version>
+		</dependency>
+
+		<!-- javax.annotation.Generated (for Java 9+) -->
+		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>javax.annotation-api</artifactId>
+			<version>1.3.2</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>4.0.1</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
+
+
 
 	<build>
 		<plugins>
@@ -119,6 +156,57 @@
 						</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.openapitools</groupId>
+				<artifactId>openapi-generator-maven-plugin</artifactId>
+				<version>7.4.0</version>
+				<executions>
+					<execution>
+						<id>generate-api</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<phase>generate-sources</phase>
+						<configuration>
+							<inputSpec>${project.basedir}/src/main/resources/openapi.yaml</inputSpec>
+							<generatorName>spring</generatorName>
+							<output>${project.build.directory}/generated-sources/openapi</output>
+							<apiPackage>com.poziomk3.api</apiPackage>
+							<modelPackage>com.poziomk3.dto</modelPackage>
+							<invokerPackage>com.poziomk3</invokerPackage>
+							<generateModelTests>false</generateModelTests>
+							<generateApiTests>false</generateApiTests>
+							<configOptions>
+								<interfaceOnly>true</interfaceOnly>
+								<useSpringBoot3>true</useSpringBoot3>
+							</configOptions>
+
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>add-openapi-sources</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${project.build.directory}/generated-sources/openapi/src/main/java</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
