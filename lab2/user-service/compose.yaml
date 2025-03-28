@@ -44,7 +44,7 @@ services:
     volumes:
       - pgdata_stats:/var/lib/postgresql/data
 
-  # --- PostgreSQL for stats-service ---
+  # --- PostgreSQL for role-service ---
   role-service-db:
     image: postgres:15
     container_name: role-service-db
@@ -70,8 +70,24 @@ services:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
 
+  # --- MinIO for template storage ---
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    environment:
+      MINIO_ACCESS_KEY: minioaccesskey
+      MINIO_SECRET_KEY: miniosecretkey
+    ports:
+      - "9000:9000"    # MinIO API
+      - "9001:9001"    # MinIO Console
+    volumes:
+      - minio_data:/data
+    command: server /data
+    restart: always
+
 volumes:
   pgdata_user:
   pgdata_userman:
   pgdata_stats:
   pgdata_role:
+  minio_data:

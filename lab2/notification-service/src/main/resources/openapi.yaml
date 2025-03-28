@@ -1,90 +1,59 @@
 openapi: 3.0.3
 info:
-  title: User Service API
+  title: Notification Service API
   version: 1.0.0
-  description: Handles user registration and retrieval.
+  description: >
+    Service responsible for sending user-facing notifications (e.g., welcome emails, role assignment alerts).
+    Consumes events from RabbitMQ and uses MinIO for email templates.
 
 paths:
-  /users:
+  /notifications/test-send:
     post:
-      summary: Register a new user
-      operationId: registerUser
+      summary: Send test notification (DEV only)
+      operationId: testSendNotification
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RegisterUserRequest'
-      responses:
-        '201':
-          description: User successfully registered
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RegisterUserResponse'
-        '400':
-          description: Invalid input
-
-  /users/{id}:
-    get:
-      summary: Get user details
-      operationId: getUserById
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+              $ref: '#/components/schemas/TestNotificationRequest'
       responses:
         '200':
-          description: User found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserDto'
-        '404':
-          description: User not found
+          description: Notification sent successfully
+        '500':
+          description: Failed to send notification
 
 components:
   schemas:
-    RegisterUserRequest:
+    TestNotificationRequest:
       type: object
       required:
-        - email
-        - password
+        - to
+        - template
+        - variables
       properties:
-        email:
+        to:
           type: string
           format: email
-        password:
+        template:
           type: string
-          format: password
+          example: welcome/en.html
+        variables:
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            userName: Karol
+            role: ROLE_USER
 
-    RegisterUserResponse:
-      type: object
-      properties:
-        userId:
-          type: string
-          format: uuid
-
-    UserDto:
-      type: object
-      properties:
-        userId:
-          type: string
-          format: uuid
-        email:
-          type: string
-          format: email
-        createdAt:
-          type: string
-          format: date-time
-
-    UserRegisteredEvent:
+    # Consumed Event - UserCreated
+    UserCreatedEvent:
       x-event: true
       type: object
-      description: Event emitted after a user is successfully registered
+      required:
+        - userId
+        - email
+        - createdAt
       properties:
         userId:
           type: string
@@ -95,3 +64,23 @@ components:
         createdAt:
           type: string
           format: date-time
+
+    # Consumed Event - RoleAssigned
+    RoleAssignedEvent:
+      x-event: true
+      type: object
+      required:
+        - userId
+        - email
+        - roles
+      properties:
+        userId:
+          type: string
+          format: uuid
+        email:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+          example: [ "ROLE_USER" ]
