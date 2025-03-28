@@ -17,6 +17,6 @@ public class UserCreatedEventListener {
 
     @RabbitListener(queues = RabbitMQConfig.USER_CREATED_QUEUE)
     public void handle(UserCreatedEvent event) {
-        handler.handle(event.getUserId());
+        handler.handle(event);
     }
 }

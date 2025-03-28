@@ -1,6 +1,7 @@
 package com.poziomk3.role_service.app.command;
 
 import com.poziomk3.dto.RoleAssignedEvent;
+import com.poziomk3.dto.UserCreatedEvent;
 import com.poziomk3.role_service.domain.model.UserRole;
 import com.poziomk3.role_service.domain.model.Role;
 import com.poziomk3.role_service.domain.repository.RoleRepository;
@@ -11,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.EnumSet;
 import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -26,16 +26,16 @@ public class AssignDefaultRoleHandler {
     }
 
     @Transactional
-    public void handle(UUID userId) {
-        UserRole role = new UserRole(userId, EnumSet.of(Role.USER));
+    public void handle(UserCreatedEvent event) {
+        UserRole role = new UserRole(event.getUserId(), EnumSet.of(Role.USER));
         repository.save(role);
 
-        log.info("Assigned default role '{}' to user {}", Role.USER, userId);
+        log.info("Assigned default role '{}' to user {}", Role.USER, event.getUserId());
 
-        RoleAssignedEvent event = new RoleAssignedEvent(userId, List.of(Role.USER.name()));
-        publisher.publish(event);
+        RoleAssignedEvent publish = new RoleAssignedEvent(event.getUserId(), event.getEmail(), List.of(Role.USER.name()));
+        publisher.publish(publish);
 
-        log.info("Published RoleAssignedEvent for user {}", userId);
+        log.info("Published RoleAssignedEvent for user {}", event.getUserId());
     }
 
 }

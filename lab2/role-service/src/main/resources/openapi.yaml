@@ -53,11 +53,14 @@ components:
       type: object
       required:
         - userId
+        - email
         - roles
       properties:
         userId:
           type: string
           format: uuid
+        email:
+          type: string
         roles:
           type: array
           items:
