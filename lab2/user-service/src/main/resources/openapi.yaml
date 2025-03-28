@@ -42,12 +42,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserDto'
+                $ref: '#/components/schemas/MinimalUserDto'
         '404':
           description: User not found
 
 components:
   schemas:
+    # DTO for POST /users request
     RegisterUserRequest:
       type: object
       required:
@@ -61,15 +62,23 @@ components:
           type: string
           format: password
 
+    # DTO for POST /users response
     RegisterUserResponse:
       type: object
+      required:
+        - userId
       properties:
         userId:
           type: string
           format: uuid
 
-    UserDto:
+    # DTO for GET /users/{id} response (minimal info)
+    MinimalUserDto:
       type: object
+      required:
+        - userId
+        - email
+        - createdAt
       properties:
         userId:
           type: string
@@ -81,10 +90,15 @@ components:
           type: string
           format: date-time
 
+    # Event DTO (sent via RabbitMQ, not exposed as API)
     UserRegisteredEvent:
       x-event: true
       type: object
-      description: Event emitted after a user is successfully registered
+      required:
+        - userId
+        - email
+        - password
+        - createdAt
       properties:
         userId:
           type: string
@@ -92,6 +106,8 @@ components:
         email:
           type: string
           format: email
+        password:
+          type: string
         createdAt:
           type: string
           format: date-time

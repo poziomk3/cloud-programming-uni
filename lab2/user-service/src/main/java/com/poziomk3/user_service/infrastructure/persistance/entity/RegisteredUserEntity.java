@@ -13,10 +13,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserEntity {
+public class RegisteredUserEntity {
     @Id
     public UUID id;
     public String email;
     public OffsetDateTime createdAt;
-    public String passwordHash;
 }
