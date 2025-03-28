@@ -1,90 +1,42 @@
 openapi: 3.0.3
 info:
-  title: User Service API
+  title: Stats Service API
   version: 1.0.0
-  description: Handles user registration and retrieval.
+  description: Tracks system-wide statistics like total user registrations.
 
 paths:
-  /users:
-    post:
-      summary: Register a new user
-      operationId: registerUser
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RegisterUserRequest'
-      responses:
-        '201':
-          description: User successfully registered
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RegisterUserResponse'
-        '400':
-          description: Invalid input
-
-  /users/{id}:
+  /stats/registrations:
     get:
-      summary: Get user details
-      operationId: getUserById
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+      summary: Get total registered users
+      operationId: getTotalRegistrations
       responses:
         '200':
-          description: User found
+          description: Total registrations retrieved
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserDto'
-        '404':
-          description: User not found
+                $ref: '#/components/schemas/TotalRegistrationsResponse'
 
 components:
   schemas:
-    RegisterUserRequest:
+    TotalRegistrationsResponse:
       type: object
       required:
-        - email
-        - password
+        - total
       properties:
-        email:
-          type: string
-          format: email
-        password:
-          type: string
-          format: password
+        total:
+          type: integer
+          format: int32
+          example: 1234
 
-    RegisterUserResponse:
-      type: object
-      properties:
-        userId:
-          type: string
-          format: uuid
-
-    UserDto:
-      type: object
-      properties:
-        userId:
-          type: string
-          format: uuid
-        email:
-          type: string
-          format: email
-        createdAt:
-          type: string
-          format: date-time
-
-    UserRegisteredEvent:
+    # Event from user-man-service
+    UserCreatedEvent:
       x-event: true
       type: object
-      description: Event emitted after a user is successfully registered
+      required:
+        - userId
+        - email
+        - createdAt
       properties:
         userId:
           type: string

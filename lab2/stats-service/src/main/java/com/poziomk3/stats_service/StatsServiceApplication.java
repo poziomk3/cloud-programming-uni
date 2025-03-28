@@ -1,13 +1,13 @@
-package com.poziomk3.role_service;
+package com.poziomk3.stats_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class RoleServiceApplication {
+public class StatsServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(RoleServiceApplication.class, args);
+		SpringApplication.run(StatsServiceApplication.class, args);
 	}
 
 }

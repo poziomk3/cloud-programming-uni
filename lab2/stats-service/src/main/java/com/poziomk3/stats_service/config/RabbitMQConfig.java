@@ -1,4 +1,4 @@
-package com.poziomk3.role_service.config;
+package com.poziomk3.stats_service.config;
 
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;

@@ -1,4 +1,4 @@
-package com.poziomk3.role_service.config;
+package com.poziomk3.stats_service.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.parser.OpenAPIV3Parser;
