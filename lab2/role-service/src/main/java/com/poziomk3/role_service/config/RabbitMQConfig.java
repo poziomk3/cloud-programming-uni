@@ -11,25 +11,27 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
 
     public static final String USER_EXCHANGE = "user.events";
-    public static final String USER_QUEUE = "user.events.queue";
-    public static final String USER_ROUTING_KEY = "user.registered";
+    public static final String USER_CREATED_QUEUE = "role-service.user-created.queue";
+    public static final String USER_CREATED_ROUTING_KEY = "user.created";
+    public static final String ROLE_ASSIGNED_ROUTING_KEY = "role.assigned";
+
 
     @Bean
     public TopicExchange userExchange() {
-        return new TopicExchange(USER_EXCHANGE);
+        return new TopicExchange(USER_EXCHANGE, true, false);
     }
 
     @Bean
-    public Queue userQueue() {
-        return new Queue(USER_QUEUE, false);
+    public Queue userCreatedQueue() {
+        return new Queue(USER_CREATED_QUEUE, true);
     }
 
     @Bean
-    public Binding userBinding(Queue userQueue, TopicExchange userExchange) {
+    public Binding userCreatedBinding(Queue userCreatedQueue, TopicExchange userExchange) {
         return BindingBuilder
-                .bind(userQueue)
+                .bind(userCreatedQueue)
                 .to(userExchange)
-                .with(USER_ROUTING_KEY);
+                .with(USER_CREATED_ROUTING_KEY);
     }
 
     @Bean
