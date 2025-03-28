@@ -30,7 +30,21 @@ services:
     volumes:
       - pgdata_userman:/var/lib/postgresql/data
 
-  # --- Shared RabbitMQ for both ---
+  # --- PostgreSQL for stats-service ---
+  stats-service-db:
+    image: postgres:15
+    container_name: stats-service-db
+    restart: always
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: statsdb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - pgdata_stats:/var/lib/postgresql/data
+
+  # --- Shared RabbitMQ ---
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
@@ -45,3 +59,4 @@ services:
 volumes:
   pgdata_user:
   pgdata_userman:
+  pgdata_stats:   # <-- Added missing volume
