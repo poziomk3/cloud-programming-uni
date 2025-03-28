@@ -1,34 +1,14 @@
 openapi: 3.0.3
 info:
-  title: User Service API
+  title: User Management Service API
   version: 1.0.0
-  description: Handles user registration and retrieval.
+  description: Manages full user profiles and credentials.
 
 paths:
-  /users:
-    post:
-      summary: Register a new user
-      operationId: registerUser
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RegisterUserRequest'
-      responses:
-        '201':
-          description: User successfully registered
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RegisterUserResponse'
-        '400':
-          description: Invalid input
-
   /users/{id}:
     get:
-      summary: Get user details
-      operationId: getUserById
+      summary: Get full user profile by ID
+      operationId: getFullUserById
       parameters:
         - name: id
           in: path
@@ -38,38 +18,53 @@ paths:
             format: uuid
       responses:
         '200':
-          description: User found
+          description: User profile found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserDto'
+                $ref: '#/components/schemas/FullUserDto'
         '404':
           description: User not found
 
 components:
   schemas:
-    RegisterUserRequest:
+    # DTO for REST API
+    FullUserDto:
       type: object
       required:
+        - userId
         - email
         - password
+        - createdAt
       properties:
+        userId:
+          type: string
+          format: uuid
         email:
           type: string
           format: email
         password:
           type: string
           format: password
-
-    RegisterUserResponse:
-      type: object
-      properties:
-        userId:
+        firstName:
           type: string
-          format: uuid
+          nullable: true
+        lastName:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
 
-    UserDto:
+    # Event consumed from user-service
+    UserRegisteredEvent:
+      x-event: true
       type: object
+      required:
+        - userId
+        - email
+        - password
+        - createdAt
       properties:
         userId:
           type: string
@@ -77,14 +72,20 @@ components:
         email:
           type: string
           format: email
+        password:
+          type: string
         createdAt:
           type: string
           format: date-time
 
-    UserRegisteredEvent:
+    # Event emitted by user-man-service
+    UserCreatedEvent:
       x-event: true
       type: object
-      description: Event emitted after a user is successfully registered
+      required:
+        - userId
+        - email
+        - createdAt
       properties:
         userId:
           type: string

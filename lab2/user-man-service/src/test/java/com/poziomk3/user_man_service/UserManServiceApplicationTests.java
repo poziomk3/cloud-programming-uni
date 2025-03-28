@@ -1,10 +1,10 @@
-package com.poziomk3.role_service;
+package com.poziomk3.user_man_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class RoleServiceApplicationTests {
+class UserManServiceApplicationTests {
 
 	@Test
 	void contextLoads() {

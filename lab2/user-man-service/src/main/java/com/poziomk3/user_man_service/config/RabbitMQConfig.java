@@ -1,4 +1,4 @@
-package com.poziomk3.role_service.config;
+package com.poziomk3.user_man_service.config;
 
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -11,25 +11,27 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
 
     public static final String USER_EXCHANGE = "user.events";
-    public static final String USER_QUEUE = "user.events.queue";
-    public static final String USER_ROUTING_KEY = "user.registered";
+    public static final String USER_REGISTERED_QUEUE = "user-man.user-registered.queue";
+    public static final String USER_REGISTERED_ROUTING_KEY = "user.registered";
+
+    public static final String USER_CREATED_ROUTING_KEY = "user.created";
 
     @Bean
     public TopicExchange userExchange() {
-        return new TopicExchange(USER_EXCHANGE);
+        return new TopicExchange(USER_EXCHANGE, true, false);
     }
 
     @Bean
-    public Queue userQueue() {
-        return new Queue(USER_QUEUE, false);
+    public Queue userRegisteredQueue() {
+        return new Queue(USER_REGISTERED_QUEUE, true);
     }
 
     @Bean
-    public Binding userBinding(Queue userQueue, TopicExchange userExchange) {
+    public Binding userRegisteredBinding(Queue userRegisteredQueue, TopicExchange userExchange) {
         return BindingBuilder
-                .bind(userQueue)
+                .bind(userRegisteredQueue)
                 .to(userExchange)
-                .with(USER_ROUTING_KEY);
+                .with(USER_REGISTERED_ROUTING_KEY);
     }
 
     @Bean

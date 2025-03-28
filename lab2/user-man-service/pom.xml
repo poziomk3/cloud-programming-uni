@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.poziomk3</groupId>
-    <artifactId>role-service</artifactId>
+    <artifactId>user-man-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>role-service</name>
+    <name>user-man-service</name>
     <description>Demo project for Spring Boot</description>
     <url/>
     <licenses>

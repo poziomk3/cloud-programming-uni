@@ -2,7 +2,8 @@ version: '3.8'
 
 services:
 
-  postgres:
+  # --- PostgreSQL for user-service ---
+  user-service-db:
     image: postgres:15
     container_name: user-service-db
     restart: always
@@ -13,11 +14,26 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata_user:/var/lib/postgresql/data
 
+  # --- PostgreSQL for user-man-service ---
+  user-man-service-db:
+    image: postgres:15
+    container_name: user-man-service-db
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: usermandb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - pgdata_userman:/var/lib/postgresql/data
+
+  # --- Shared RabbitMQ for both ---
   rabbitmq:
     image: rabbitmq:3-management
-    container_name: user-service-rabbit
+    container_name: rabbitmq
     restart: always
     ports:
       - "5672:5672"     # AMQP
@@ -27,4 +43,5 @@ services:
       RABBITMQ_DEFAULT_PASS: guest
 
 volumes:
-  pgdata:
+  pgdata_user:
+  pgdata_userman:
