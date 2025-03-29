@@ -1,34 +1,20 @@
-# Start from an OpenJDK 21 base image
-FROM eclipse-temurin:21-jdk as build
+#docker build -t user-service . --no-cache
 
-# Set working directory
+# ----------- Build stage -----------
+FROM maven:3.9-eclipse-temurin AS build
 WORKDIR /app
-
-# Copy pom.xml and download dependencies
-COPY pom.xml ./
-RUN mkdir -p target
-COPY .mvn .mvn
-COPY mvnw .
-RUN ./mvnw dependency:go-offline
-
-# Copy project files
+COPY pom.xml .
 COPY src ./src
+RUN mvn clean package -DskipTests
 
-# Build the application
-RUN ./mvnw clean package -DskipTests
 
-# ---
-
-# Use a minimal JRE image for running
-FROM eclipse-temurin:21-jre-alpine
+# ----------- Distroless Runtime stage -----------
+FROM gcr.io/distroless/java21-debian12
 
 WORKDIR /app
+COPY --from=build /app/target/*user-service*.jar /app/user-service.jar
 
-# Copy the built JAR from the build stage
-COPY --from=build /app/target/user-service-0.0.1-SNAPSHOT.jar app.jar
-
-# Expose the default Spring Boot port
 EXPOSE 8080
 
-# Run the app
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Pass env vars at runtime via Docker Compose or CLI (recommended)
+ENTRYPOINT ["java", "-jar", "/app/user-service.jar"]
