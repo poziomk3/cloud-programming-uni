@@ -1,4 +1,6 @@
 #docker build -t notification-service . --no-cache
+#docker tag notification-service:latest 339888520068.dkr.ecr.us-east-1.amazonaws.com/cloud-programming:notification-service
+#docker push 339888520068.dkr.ecr.us-east-1.amazonaws.com/cloud-programming:notification-service
 
 # ----------- Build stage -----------
 FROM maven:3.9-eclipse-temurin AS build

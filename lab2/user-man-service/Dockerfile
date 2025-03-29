@@ -1,4 +1,7 @@
 #docker build -t user-man-service . --no-cache
+#docker tag user-man-service:latest 339888520068.dkr.ecr.us-east-1.amazonaws.com/cloud-programming:user-man-service
+#docker push 339888520068.dkr.ecr.us-east-1.amazonaws.com/cloud-programming:user-man-service
+
 
 # ----------- Build stage -----------
 FROM maven:3.9-eclipse-temurin AS build
