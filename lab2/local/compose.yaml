@@ -1,71 +1,129 @@
-version: '3.8'
-
 services:
-
+  # --- RabbitMQ ---
   rabbitmq:
-    image: public.ecr.aws/docker/library/rabbitmq:4.1.0-beta.5-management-alpine
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
     ports:
       - "5672:5672"
       - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
-
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  # --- MinIO ---
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    environment:
+      MINIO_ACCESS_KEY: minioaccesskey
+      MINIO_SECRET_KEY: miniosecretkey
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    command: server /data
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  # --- Databases ---
   user-service-db:
-    image: public.ecr.aws/docker/library/postgres:latest
+    image: postgres:15
+    container_name: user-service-db
+    restart: always
     ports:
       - "5432:5432"
     environment:
       POSTGRES_DB: userdb
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
+    volumes:
+      - pgdata_user:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   user-man-service-db:
-    image: public.ecr.aws/docker/library/postgres:latest
+    image: postgres:15
+    container_name: user-man-service-db
+    restart: always
     ports:
       - "5433:5432"
     environment:
       POSTGRES_DB: usermandb
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
+    volumes:
+      - pgdata_userman:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   stats-service-db:
-    image: public.ecr.aws/docker/library/postgres:latest
+    image: postgres:15
+    container_name: stats-service-db
+    restart: always
     ports:
       - "5434:5432"
     environment:
       POSTGRES_DB: statsdb
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
+    volumes:
+      - pgdata_stats:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   role-service-db:
-    image: public.ecr.aws/docker/library/postgres:latest
+    image: postgres:15
+    container_name: role-service-db
+    restart: always
     ports:
       - "5435:5432"
     environment:
       POSTGRES_DB: roledb
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
+    volumes:
+      - pgdata_role:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  minio:
-    image: public.ecr.aws/bitnami/minio:latest
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    environment:
-      MINIO_ACCESS_KEY: minioaccesskey
-      MINIO_SECRET_KEY: miniosecretkey
-    command: server /data
+  # --- Microservices ---
 
   user-service:
-    image: 339888520068.dkr.ecr.us-east-1.amazonaws.com/cloud-programming-lab2:user-service
+    image: user-service
+    container_name: user-service
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      user-service-db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
     environment:
       SPRING_APPLICATION_NAME: user-service
       SPRING_DATASOURCE_URL: jdbc:postgresql://user-service-db:5432/userdb
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_SHOW_SQL: true
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: guest
@@ -73,14 +131,20 @@ services:
       SPRING_PROFILES_ACTIVE: prod
 
   user-man-service:
-    image: 339888520068.dkr.ecr.us-east-1.amazonaws.com/cloud-programming-lab2:user-man-service
+    image: user-man-service
+    container_name: user-man-service
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      user-man-service-db:
+        condition: service_healthy
+    ports:
+      - "8079:8080"
     environment:
       SPRING_APPLICATION_NAME: user-man-service
       SPRING_DATASOURCE_URL: jdbc:postgresql://user-man-service-db:5432/usermandb
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_SHOW_SQL: true
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: guest
@@ -88,14 +152,20 @@ services:
       SPRING_PROFILES_ACTIVE: prod
 
   stats-service:
-    image: 339888520068.dkr.ecr.us-east-1.amazonaws.com/cloud-programming-lab2:stats-service
+    image: stats-service
+    container_name: stats-service
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      stats-service-db:
+        condition: service_healthy
+    ports:
+      - "8078:8080"
     environment:
       SPRING_APPLICATION_NAME: stats-service
       SPRING_DATASOURCE_URL: jdbc:postgresql://stats-service-db:5432/statsdb
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_SHOW_SQL: true
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: guest
@@ -103,14 +173,20 @@ services:
       SPRING_PROFILES_ACTIVE: prod
 
   role-service:
-    image: 339888520068.dkr.ecr.us-east-1.amazonaws.com/cloud-programming-lab2:role-service
+    image: role-service
+    container_name: role-service
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      role-service-db:
+        condition: service_healthy
+    ports:
+      - "8077:8080"
     environment:
       SPRING_APPLICATION_NAME: role-service
       SPRING_DATASOURCE_URL: jdbc:postgresql://role-service-db:5432/roledb
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_SHOW_SQL: true
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: guest
@@ -118,29 +194,44 @@ services:
       SPRING_PROFILES_ACTIVE: prod
 
   notification-service:
-    image: 339888520068.dkr.ecr.us-east-1.amazonaws.com/cloud-programming-lab2:notification-service
+    image: notification-service
+    container_name: notification-service
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    ports:
+      - "8076:8080"
     environment:
       SPRING_APPLICATION_NAME: notification-service
       SPRING_PROFILES_ACTIVE: prod
       SPRING_AUTOCONFIGURE_EXCLUDE: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-      SERVER_PORT: 8080
-
+      # MinIO
       MINIO_URL: http://minio:9000
       MINIO_ACCESSKEY: minioaccesskey
       MINIO_SECRETKEY: miniosecretkey
       MINIO_BUCKETNAME: my-bucket
 
+      # Email (Mailtrap)
       SPRING_MAIL_HOST: sandbox.smtp.mailtrap.io
       SPRING_MAIL_PORT: 2525
       SPRING_MAIL_USERNAME: ab2cb08195bcf7
       SPRING_MAIL_PASSWORD: 20ed82baa0418b
-      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: true
-      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: true
 
+      # RabbitMQ
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: guest
       SPRING_RABBITMQ_PASSWORD: guest
 
+      # Logging
       LOGGING_LEVEL_ROOT: INFO
       LOGGING_LEVEL_COM_POZIOMK3: DEBUG
+
+volumes:
+  pgdata_user:
+  pgdata_userman:
+  pgdata_stats:
+  pgdata_role:
+  minio_data:
