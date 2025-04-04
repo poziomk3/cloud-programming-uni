@@ -4,8 +4,10 @@ import com.poziomk3.dto.UserCreatedEvent;
 import com.poziomk3.user_man_service.domain.model.User;
 import com.poziomk3.user_man_service.domain.repository.UserRepository;
 import com.poziomk3.user_man_service.infrastructure.messaging.UserEventPublisher;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class RegisterUserCommandHandler {
 
@@ -18,6 +20,8 @@ public class RegisterUserCommandHandler {
     }
 
     public void handle(RegisterUserCommand command) {
+        log.info("Handling RegisterUserCommand for email: {}", command.email());
+
         User user = new User(
                 command.userId(),
                 command.email(),
@@ -28,6 +32,7 @@ public class RegisterUserCommandHandler {
         );
 
         userRepository.save(user);
+        log.info("User saved with ID: {}", user.userId());
 
         UserCreatedEvent createdEvent = new UserCreatedEvent()
                 .userId(user.userId())
@@ -35,5 +40,6 @@ public class RegisterUserCommandHandler {
                 .createdAt(user.createdAt());
 
         eventPublisher.publish(createdEvent);
+        log.info("UserCreatedEvent published for userId: {}", user.userId());
     }
 }

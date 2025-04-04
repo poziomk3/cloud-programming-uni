@@ -7,6 +7,7 @@ import com.poziomk3.dto.RegisterUserResponse;
 import com.poziomk3.user_service.app.command.RegisterUserCommandHandler;
 import com.poziomk3.user_service.app.mapper.UserApiMapper;
 import com.poziomk3.user_service.app.query.GetUserByIdQueryHandler;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,7 +23,7 @@ public class UsersApiImpl implements UsersApi {
     public UsersApiImpl(
             RegisterUserCommandHandler registerHandler,
             GetUserByIdQueryHandler queryHandler,
-            UserApiMapper mapper
+            @Qualifier("userApiMapperImpl") UserApiMapper mapper
     ) {
         this.registerHandler = registerHandler;
         this.queryHandler = queryHandler;

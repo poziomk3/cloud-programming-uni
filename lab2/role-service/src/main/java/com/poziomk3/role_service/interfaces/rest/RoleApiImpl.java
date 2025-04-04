@@ -3,14 +3,13 @@ package com.poziomk3.role_service.interfaces.rest;
 import com.poziomk3.api.RolesApi;
 import com.poziomk3.dto.UserRolesResponse;
 import com.poziomk3.role_service.app.query.GetUserRolesQueryHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.NativeWebRequest;
 
-import java.util.Optional;
 import java.util.UUID;
 
-
+@Slf4j
 @RestController
 public class RoleApiImpl implements RolesApi {
 
@@ -22,8 +21,9 @@ public class RoleApiImpl implements RolesApi {
 
     @Override
     public ResponseEntity<UserRolesResponse> getRolesForUser(UUID userId) {
+        log.info("Received request for roles of user with ID: {}", userId);
         var response = queryHandler.handle(userId);
+        log.info("Roles fetched for user {}: {}", userId, response.getRoles());
         return ResponseEntity.ok(response);
     }
-
 }

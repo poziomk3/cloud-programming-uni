@@ -17,7 +17,6 @@ public class RoleAssignedEventListener {
 
     @RabbitListener(queues = RabbitMQConfig.ROLE_ASSIGNED_QUEUE)
     public void handle(RoleAssignedEvent event) {
-        // Assumes only one role, can be extended
         String firstRole = event.getRoles().stream().findFirst().orElse("ROLE_UNKNOWN");
         notificationService.notifyRoleAssigned(event.getEmail(), firstRole);
     }

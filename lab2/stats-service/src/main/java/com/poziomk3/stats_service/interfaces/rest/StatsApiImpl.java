@@ -17,7 +17,7 @@ public class StatsApiImpl implements StatsApi {
 
     @Override
     public ResponseEntity<TotalRegistrationsResponse> getTotalRegistrations() {
-        var dto = queryHandler.handle(); // Returns RegistrationStats
+        var dto = queryHandler.handle();
         return ResponseEntity.ok(dto);
     }
 }
