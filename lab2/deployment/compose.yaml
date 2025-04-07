@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  user-service:
+    image: lab2-user-service
+    container_name: user-service
+    ports:
+      - "8080:8080"
+    env_file: .env
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL_USER}
+  user-man-service:
+    image: lab2-user-man-service
+    container_name: user-man-service
+    ports:
+      - "8079:8080"
+    env_file: .env
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL_USER_MAN}
+  stats-service:
+    image: lab2-stats-service
+    container_name: stats-service
+    ports:
+      - "8078:8080"
+    env_file: .env
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL_STATS}
+  role-service:
+    image: lab2-role-service
+    container_name: role-service
+    ports:
+      - "8077:8080"
+    env_file: .env
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL_ROLE}
+  notification-service:
+    image: lab2-notification-service
+    container_name: notification-service
+    ports:
+      - "8076:8080"
+    env_file: .env
+
