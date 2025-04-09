@@ -48,10 +48,8 @@ components:
           format: password
         firstName:
           type: string
-          nullable: true
         lastName:
           type: string
-          nullable: true
         createdAt:
           type: string
           format: date-time

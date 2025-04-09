@@ -4,20 +4,18 @@ import com.poziomk3.dto.UserCreatedEvent;
 import com.poziomk3.user_man_service.domain.model.User;
 import com.poziomk3.user_man_service.domain.repository.UserRepository;
 import com.poziomk3.user_man_service.infrastructure.messaging.UserEventPublisher;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class RegisterUserCommandHandler {
 
     private final UserRepository userRepository;
     private final UserEventPublisher eventPublisher;
 
-    public RegisterUserCommandHandler(UserRepository userRepository, UserEventPublisher eventPublisher) {
-        this.userRepository = userRepository;
-        this.eventPublisher = eventPublisher;
-    }
 
     public void handle(RegisterUserCommand command) {
         log.info("Handling RegisterUserCommand for email: {}", command.email());

@@ -7,7 +7,7 @@ variable "db_user" {
 }
 
 variable "db_password" {
-  default = "Nervarien123!"
+  default = "Y3ougOsIM1X4V8XcSKHE"
 }
 
 variable "dbs" {
