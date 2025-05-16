@@ -13,8 +13,8 @@ data "aws_subnets" "default" {
   }
 }
 
-resource "aws_security_group" "db_sg" {
-  name   = "lab2-db-sg"
+resource "aws_security_group" "db_sg_custom" {
+  name   = "lab2-db-sg-custom"
   vpc_id = data.aws_vpc.default.id
 
   ingress {
@@ -40,7 +40,7 @@ resource "aws_security_group" "db_sg" {
 }
 
 resource "aws_db_subnet_group" "default" {
-  name       = "lab2-subnet-group"
+  name       = "lab2-subnet-group-custom"
   subnet_ids = data.aws_subnets.default.ids
 }
 
@@ -55,7 +55,7 @@ resource "aws_db_instance" "services" {
   password               = var.db_password
   db_name                = each.value
   db_subnet_group_name   = aws_db_subnet_group.default.name
-  vpc_security_group_ids = [aws_security_group.db_sg.id]
+  vpc_security_group_ids = [aws_security_group.db_sg_custom.id]
   skip_final_snapshot    = true
   publicly_accessible    = true
 }

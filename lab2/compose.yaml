@@ -26,6 +26,7 @@ services:
     ports:
       - "9000:9000"
       - "9001:9001"
+    
     volumes:
       - minio_data:/data
     command: server /data
@@ -210,8 +211,8 @@ services:
       # Email (Mailtrap)
       SPRING_MAIL_HOST: sandbox.smtp.mailtrap.io
       SPRING_MAIL_PORT: 2525
-      SPRING_MAIL_USERNAME: ab2cb08195bcf7
-      SPRING_MAIL_PASSWORD: 20ed82baa0418b
+      SPRING_MAIL_USERNAME: 37a41d931013da
+      SPRING_MAIL_PASSWORD: db4c6a9b3673d4
 
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
