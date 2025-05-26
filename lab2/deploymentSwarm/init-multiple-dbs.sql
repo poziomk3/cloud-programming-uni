@@ -1,0 +1,3 @@
+CREATE DATABASE usermandb;
+CREATE DATABASE statsdb;
+CREATE DATABASE roledb;
